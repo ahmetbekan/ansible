@@ -1,0 +1,28 @@
+---
+- name: wordpress installation
+  hosts: all
+  user: centos
+  connection: ssh
+  become: yes
+  become_method: sudo
+  vars: 
+   wp_mysql_db: wordpress
+   wp_mysql_user: wp-admin
+   wp_mysql_password: tensult
+   wp_mysql_host: "{{ansible_default_ipv4.address}}" 
+  tasks:
+  
+  - name: installation of dependencies
+    when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "7")
+    package:
+      name: "{{item}}"
+      state: present
+    with_items:
+    - httpd
+    #- php
+    
+  - name: Starting apache
+    service: 
+      name: httpd
+      state: restarted
+      enabled: true      

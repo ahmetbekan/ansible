@@ -1,0 +1,47 @@
+---
+- name: Agent Installation
+  hosts: all
+  user: centos
+  connection: ssh
+  become: yes
+  become_method: sudo
+  tasks:
+  - name: Install Packages
+    package:
+      name: "{{item}}"
+      state: present          #absent     latest
+    with_items:
+    - vsftpd
+    - lftp
+    - telnet
+    - httpd 
+    - elinks
+    - wget
+    - curl 
+
+
+  - name: Adds multiple users
+    user:
+      name: "{{item}}"
+      state: present
+    with_items:
+    - ken
+
+
+  - name: Remove multiple users
+    user:
+      name: "{{item}}"
+      state: absent
+    with_items:
+    - bob
+    # Ticket #
+    - lisa
+    - samantha
+    ignore_errors: yes
+    
+
+
+  - name: Add Admin Group
+    group:
+      name: admin
+      state: present

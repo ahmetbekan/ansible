@@ -1,0 +1,38 @@
+---
+- name: create username and public key
+  # gather_facts: no
+  hosts: all
+  become: true
+  become_method: sudo
+  user: centos
+  vars_prompt:
+    - name: username
+      prompt: "What is your username?"
+      private: no
+    - name: password
+      prompt: "What is your password?"
+  tasks:
+    - debug:
+        msg: 'Logging in as {{ username }}'
+    - name: add users
+      user:
+        name: "{{username}}"
+        state: present
+        generate_ssh_key: true
+    - name: Run local playbook
+      import_playbook: vm.yaml
+
+    - name: Set authorized key taken from file
+      authorized_key:
+        user: "{{username}}"
+        state: present
+        manage_dir: yes
+        key: "{{ lookup('file', '/home/"{{username}}"/.ssh/id_rsa.pub') }}"
+ 
+    # - name: Set authorized key in alternate location
+    #   authorized_key:
+    #     user: "{{username}}"
+    #     state: present
+    #     key: "{{ lookup('file', '/home/{{username}}/.ssh/id_rsa.pub') }}"
+    #     path: /etc/ssh/authorized_keys/{{username}}
+    #     manage_dir: yes    
